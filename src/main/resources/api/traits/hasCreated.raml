@@ -1,0 +1,9 @@
+#%RAML 1.0 Trait
+description: item has been created
+responses:
+  204:
+    headers: 
+      Location:
+        description: path to newly created resource
+        type: string
+        example: http://localhost:8081/api/{version}/employee-sys/employees/11

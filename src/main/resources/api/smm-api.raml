@@ -1,0 +1,51 @@
+#%RAML 1.0
+version: v1
+title: Social Media Management API
+mediaType: application/json
+baseUri: http://localhost:8081/smm/
+protocols: [HTTP]
+
+/{keyword}:
+  description: The base URI parameter for all lists retrieved
+  displayName: Keyword
+  uriParameters: 
+    keyword:
+      type: string
+      example: "Tuesday"
+      required: true
+  /tweets:
+    description: Retrieve a list of ten or less objects containing the keyword from the URI
+    displayName: Keyword
+    get:
+      queryParameters:
+        hours?:
+          description: the number of hours to search through for the keyword
+          type: number
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                { 
+                  "tweets" :[
+                    {
+                      "text": "this was my first tweet",
+                      "url": "",
+                      "screenName": "@HubbaBubba"
+                    },
+                    {
+                      "text": "this was my second",
+                      "url": "",
+                      "screenName": "@HubbaBubba"
+                    }
+                  ]
+                }
+
+  /hashtags:
+    description: Retrieve a list of hashtags from the ten most popular tweets containing the keyword from the URI
+    displayName: Keyword
+    get:
+      responses:
+        200:
+          body:
+            application/json:
