@@ -1,5 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="tweetsFlow" doc:id="094326c0-d6e0-4464-8287-4edd20420a7b" >
+		<logger level="INFO" doc:name="Logger" doc:id="b6df9d6f-5b1f-4bb5-af95-97acb54984fd" message="tweets"/>
+		<ee:transform doc:name="Transform Message" doc:id="05ccc530-2cca-4d92-b7e7-d6d728606c3f" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="dateTimeStamp" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	now: now()	
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="63cb98c1-0f7f-441d-9eb9-8d34febdf297" config-ref="HTTPS_Request_configuration" path='search/tweets.json'>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ p('token')
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"q" : vars.keyword,
+	"count": p('maxTweetCount')
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="3e62c5f0-c95f-44d5-992a-83a48729823c" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="d5ed1351-54e0-4bac-8045-66f3d3698fee" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+ {
+ 	tweets: (
+ 		payload.statuses map {
+			text: $.text as String,
+			screenName: $.user.screen_name as String,
+			url: "http://twitter.com/user/status/" ++ $.id_str
+//			url: if ($.entities.urls[0].url != null) ($.entities.urls[0].url as String) else ($.entities.urls[0].expanded_url)
+		}
+	)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="HashtagsFlow" doc:id="dda5b238-ae7e-43d6-885c-11023f4f534c" >
+		<logger level="INFO" doc:name="Logger" doc:id="646daa1f-0f13-4191-ab5c-119a1a149fc1" message="hashtags"/>
+	</flow>
+</mule>
