@@ -108,9 +108,9 @@ output application/json
                 <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Resource not found"}]]></ee:set-payload>
+ output application/json 
+ --- 
+ {message: "Resource not found"}]]></ee:set-payload> 
                     </ee:message>
                     <ee:variables>
                         <ee:set-variable variableName="httpStatus">404</ee:set-variable>
@@ -120,19 +120,19 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\(keyword)\hashtags:smm-api-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:name="Extract Keyword from URI">
             <ee:variables>
                 <ee:set-variable variableName="keyword">attributes.uriParams.'keyword'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-		<flow-ref doc:name="Flow Reference" doc:id="0aff5d62-fbdb-4d2b-a03e-01fcbdf0c767" name="HashtagsFlow"/>
+		<flow-ref doc:name="HashTagsFlow Reference" doc:id="0aff5d62-fbdb-4d2b-a03e-01fcbdf0c767" name="HashtagsFlow"/>
     </flow>
     <flow name="get:\(keyword)\tweets:smm-api-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" doc:name="Extract Keyword form URI">
             <ee:variables>
                 <ee:set-variable variableName="keyword">attributes.uriParams.'keyword'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-		<flow-ref doc:name="Flow Reference" doc:id="f4a57d3f-f30b-4b82-b9d0-630eae602e68" name="tweetsFlow"/>
+		<flow-ref doc:name="tweetsFlow Reference" doc:id="f4a57d3f-f30b-4b82-b9d0-630eae602e68" name="tweetsFlow"/>
     </flow>
 </mule>

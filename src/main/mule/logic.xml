@@ -6,17 +6,11 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="tweetsFlow" doc:id="094326c0-d6e0-4464-8287-4edd20420a7b" >
-		<logger level="INFO" doc:name="Logger" doc:id="b6df9d6f-5b1f-4bb5-af95-97acb54984fd" message="tweets"/>
-		<ee:transform doc:name="Transform Message" doc:id="05ccc530-2cca-4d92-b7e7-d6d728606c3f" >
+		<ee:transform doc:name="Create Time Stamp" doc:id="05ccc530-2cca-4d92-b7e7-d6d728606c3f" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
-				<ee:set-variable variableName="dateTimeStamp" ><![CDATA[%dw 2.0
-output application/java
----
-{
-	now: now()	
-}]]></ee:set-variable>
+				<ee:set-variable resource="dwl/createTimeStamp.dwl" variableName="maxSearchTime" />
 			</ee:variables>
 		</ee:transform>
 		<http:request method="GET" doc:name="Request" doc:id="63cb98c1-0f7f-441d-9eb9-8d34febdf297" config-ref="HTTPS_Request_configuration" path='search/tweets.json'>
@@ -32,26 +26,36 @@ output application/java
 	"count": p('maxTweetCount')
 }]]]></http:query-params>
 		</http:request>
-		<logger level="INFO" doc:name="Logger" doc:id="3e62c5f0-c95f-44d5-992a-83a48729823c" message="#[payload]"/>
-		<ee:transform doc:name="Transform Message" doc:id="d5ed1351-54e0-4bac-8045-66f3d3698fee" >
+		<ee:transform doc:name="Build Tweets Payload" doc:id="d5ed1351-54e0-4bac-8045-66f3d3698fee" >
 			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
- {
- 	tweets: (
- 		payload.statuses map {
-			text: $.text as String,
-			screenName: $.user.screen_name as String,
-			url: "http://twitter.com/user/status/" ++ $.id_str
-//			url: if ($.entities.urls[0].url != null) ($.entities.urls[0].url as String) else ($.entities.urls[0].expanded_url)
-		}
-	)
-}]]></ee:set-payload>
+				<ee:set-payload resource="dwl/tweetsPayload.dwl" />
 			</ee:message>
 		</ee:transform>
 	</flow>
 	<flow name="HashtagsFlow" doc:id="dda5b238-ae7e-43d6-885c-11023f4f534c" >
-		<logger level="INFO" doc:name="Logger" doc:id="646daa1f-0f13-4191-ab5c-119a1a149fc1" message="hashtags"/>
+		<http:request method="GET" doc:name="Request" doc:id="69cd132d-6345-41f0-9ee4-e0972cd787e2" config-ref="HTTPS_Request_configuration" path='search/tweets.json'>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ p('token')
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"q" : vars.keyword,
+	"count": p('maxTweetCount'),
+	"result_type": 'popular'
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Extract HashTags" doc:id="12c59fb1-774d-40f8-beb1-fd8f938e7de5" >
+			<ee:message >
+				<ee:set-payload resource="dwl/extractHashTags.dwl" />
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Clean Extracted HashTags" doc:id="5e3fce90-682a-411f-957c-46ce7e18f620" >
+			<ee:message >
+				<ee:set-payload resource="dwl/cleanExtractedHashTags.dwl" />
+			</ee:message>
+		</ee:transform>
 	</flow>
 </mule>
