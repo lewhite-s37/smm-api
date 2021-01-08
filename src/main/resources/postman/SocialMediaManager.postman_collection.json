@@ -1,0 +1,71 @@
+{
+	"info": {
+		"_postman_id": "f6e1a3ac-2997-498e-8519-c55055debd32",
+		"name": "SocialMediaManager",
+		"description": "Allows for easy execution of smm-api for demonstration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "{{url}}/smm/happy/hashtags",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/smm/happy/hashtags",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"smm",
+						"happy",
+						"hashtags"
+					]
+				},
+				"description": "Hashtags from popular tweets"
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}/smm/it worked/tweets?hours=1",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/smm/it worked/tweets?hours=1",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"smm",
+						"it worked",
+						"tweets"
+					],
+					"query": [
+						{
+							"key": "hours",
+							"value": "1"
+						}
+					]
+				},
+				"description": "Up to ten tweets based on a key word. Query parameter is required."
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
